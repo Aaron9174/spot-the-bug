@@ -1,29 +1,36 @@
 /**
  * The bug here is because the max array size in JS is 2^32 - 1
  * Solution: batching the test set
+ * 
+ * NOTE: The program takes a REALLY long time to run due to the size of the arrays
+ * I wonder if a form of parralism could be used here, but synching after may make this untenable
+ * 
+ * NOTE2: This must be ran with a higher heap size
+ * node --max-old-space-size=4096 bug.js
  */
 function stressTest() {
     console.time('Total Stress Test Duration');
   
     const arraySize = Math.pow(2, 32);
-    const batchLen = arraySize / 2;
-    let batchArray1 = new Array(batchLen).fill(0);
-    let batchArray2 = new Array(batchLen).fill(0);
+    const batchSize = arraySize / 2;
+    let batch1 = new Array(batchSize);
+    let batch2 = new Array(batchSize);
+
   
     console.time('Populate Array');
     const populateFunc = () => Math.floor(Math.random() * 1000);
-    batchArray1 = batchArray1.map(populateFunc);
-    batchArray2 = batchArray2.map(populateFunc)
+    batch1 = batch1.map(populateFunc);
+    batch2 = batch2.map(populateFunc)
     console.timeEnd('Populate Array');
   
     console.time('Sort Array');
-    batchArray1.sort((a, b) => a - b);
-    batchArray2.sort((a, b) => a - b);
+    batch1.sort((a, b) => a - b);
+    batch2.sort((a, b) => a - b);
     console.timeEnd('Sort Array');
   
     console.time('Filter Even Numbers');
-    const oddBatch1Array = oddBatch1Array.filter(num => num % 2 !== 0);
-    const oddBatch2Array = oddBatch2Array.filter(num => num % 2 !== 0);
+    let oddBatch1Array = batch1.filter(num => num % 2 !== 0);
+    let oddBatch2Array = batch2.filter(num => num % 2 !== 0);
     console.timeEnd('Filter Even Numbers');
   
     console.time('Square Numbers');
